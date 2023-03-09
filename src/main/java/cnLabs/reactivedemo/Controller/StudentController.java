@@ -18,6 +18,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
+// This class is technically a handler, only required to be annotated with @Component.
 @Component
 public class StudentController {
 
@@ -47,6 +48,7 @@ public class StudentController {
                 });
     }
 
+    // Jared says this method is easier to maintain.
     public Mono<ServerResponse> getAllStudents(ServerRequest request) {
         Flux<Student> students = studentService.getAllStudents();
         return ok()

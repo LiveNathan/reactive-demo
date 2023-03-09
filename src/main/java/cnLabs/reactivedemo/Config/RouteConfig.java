@@ -1,7 +1,6 @@
 package cnLabs.reactivedemo.Config;
 
 import cnLabs.reactivedemo.Controller.StudentController;
-import cnLabs.reactivedemo.Controller.TeacherController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
