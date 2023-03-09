@@ -41,19 +41,18 @@ public class TeacherController {
 
     @Bean
     public RouterFunction<ServerResponse> addNewTeacher() {
-        return route(POST("/teachers"), request -> {
-            Mono<Teacher> teacherMono = request.bodyToMono(Teacher.class);
-            return teacherService.saveTeacher(teacherMono.block())
-                    .flatMap(teacher -> ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .body(Mono.just(teacher), Teacher.class));
-        });
+        return route(POST("/teachers"), req ->
+                req.bodyToMono(Teacher.class)
+                        .flatMap(teacherService::saveTeacher)
+                        .flatMap(savedTeacher -> ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(savedTeacher))
+                        .onErrorResume(error -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
     }
 
-
     @Bean
-    RouterFunction<ServerResponse> updateTeacherRoute() {
-        return route(PUT("/update-teachers-route/{id}"),
+    RouterFunction<ServerResponse> updateTeacher() {
+        return route(PUT("/teachers/{id}"),
                 req -> {
                     Integer teacherId = Integer.parseInt(req.pathVariable("id"));
                     Mono<Teacher> teacherMono = req.bodyToMono(Teacher.class);
@@ -65,29 +64,17 @@ public class TeacherController {
                                     .build());
                 });
     }
-//    public Mono<ServerResponse> getAllTeachers(ServerRequest request) {
-//        Flux<Teacher> teachers = teacherService.getAllTeachers();
-//        return ok()
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(teachers, Teacher.class);
 
-//    }
-
-
-    public Mono<ServerResponse> updateTeacher(ServerRequest request) {
-        String teacherId = request.pathVariable("id");
-        Mono<Teacher> teacherMono = request.bodyToMono(Teacher.class);
-        return ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(teacherService.updateTeacher(Integer.valueOf(teacherId), teacherMono), Teacher.class);
+    @Bean
+    public RouterFunction<ServerResponse> deleteTeacher() {
+        return route(DELETE("/teachers/{id}"), request -> {
+            int teacherId = Integer.parseInt(request.pathVariable("id"));
+            return teacherService.getTeacher(teacherId)
+                    .flatMap(teacher -> teacherService
+                            .deleteTeacher(teacher)
+                            .then(ok().build()))
+                    .switchIfEmpty(ServerResponse.notFound().build());
+        });
     }
 
-    public Mono<ServerResponse> deleteTeacher(ServerRequest request) {
-        String teacherId = request.pathVariable("id");
-        return teacherService.getTeacher(Integer.valueOf(teacherId))
-                .flatMap(teacher -> teacherService
-                        .deleteTeacher(teacher)
-                        .then(ok().build()))
-                .switchIfEmpty(ServerResponse.notFound().build());
-    }
 }
