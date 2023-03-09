@@ -10,11 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
+import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
@@ -32,6 +30,7 @@ public class TeacherController {
                         .body(teacherService.getAllTeachers(), Teacher.class));
     }
 
+    // endpoint and route in one go
     @Bean
     public RouterFunction<ServerResponse> getTeacher() {
         return route(GET("/teachers/{id}"),
@@ -40,15 +39,17 @@ public class TeacherController {
                         .body(teacherService.getTeacher(Integer.parseInt(req.pathVariable("id"))), Teacher.class));
     }
 
-//    public Mono<ServerResponse> getTeacher(ServerRequest request) {
-//        Integer teacherId = Integer.parseInt(request.pathVariable("id"));
-//        return teacherService.getTeacher(teacherId)
-//                .flatMap(teacher -> ok()
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .body(Mono.just(teacher), Teacher.class))
-//                .switchIfEmpty(ServerResponse.notFound()
-//                        .build());
-//    }
+    @Bean
+    public RouterFunction<ServerResponse> addNewTeacher() {
+        return route(POST("/teachers"), request -> {
+            Mono<Teacher> teacherMono = request.bodyToMono(Teacher.class);
+            return teacherService.saveTeacher(teacherMono.block())
+                    .flatMap(teacher -> ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(Mono.just(teacher), Teacher.class));
+        });
+    }
+
 
     @Bean
     RouterFunction<ServerResponse> updateTeacherRoute() {
@@ -72,13 +73,6 @@ public class TeacherController {
 
 //    }
 
-    public Mono<ServerResponse> addNewTeacher(ServerRequest request) {
-        Mono<Teacher> teacherMono = request.bodyToMono(Teacher.class);
-        Mono<Teacher> newTeacher = teacherMono.flatMap(teacherService::saveTeacher);
-        return ServerResponse.status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(newTeacher, Teacher.class);
-    }
 
     public Mono<ServerResponse> updateTeacher(ServerRequest request) {
         String teacherId = request.pathVariable("id");
