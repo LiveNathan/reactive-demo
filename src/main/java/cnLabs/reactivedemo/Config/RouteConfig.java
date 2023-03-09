@@ -28,4 +28,21 @@ public class RouteConfig {
                 .andRoute(DELETE("/students/{id}")
                         .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), studentController::deleteStudent);
     }
+
+//    @Bean
+//    RouterFunction<ServerResponse> routes2(TeacherController teacherController) {
+//        return route(
+//                GET("/teachers")
+//                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), teacherController::getAllTeachers)
+//                .andRoute(GET("/teachers/{id}")
+//                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), teacherController::getTeacher)
+//                .andRoute(POST("/teachers")
+//                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), teacherController::addNewTeacher)
+//                .andRoute(PUT("/teachers/{id}")
+//                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), teacherController::updateTeacher)
+//                .andRoute(DELETE("/teachers/{id}")
+//                        .and(RequestPredicates.accept(MediaType.APPLICATION_JSON)), teacherController::deleteTeacher);
+//    }
+
+
 }
