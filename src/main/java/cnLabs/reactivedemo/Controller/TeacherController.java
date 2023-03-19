@@ -40,8 +40,8 @@ public class TeacherController {
 
     @Bean
     public RouterFunction<ServerResponse> addNewTeacher() {
-        return route(POST("/teachers"), req ->
-                req.bodyToMono(Teacher.class)
+        return route(POST("/teachers"),
+                 req -> req.bodyToMono(Teacher.class)
                         .flatMap(teacherService::saveTeacher)
                         .flatMap(savedTeacher -> ok()
                                 .contentType(MediaType.APPLICATION_JSON)
