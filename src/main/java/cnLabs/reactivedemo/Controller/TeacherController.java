@@ -19,7 +19,7 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class TeacherController {
 
     @Autowired
-    TeacherService teacherService;
+    private final TeacherService teacherService;
 
     @Bean
     public RouterFunction<ServerResponse> getAllTeachers() {
